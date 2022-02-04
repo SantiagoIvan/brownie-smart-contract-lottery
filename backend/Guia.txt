@@ -1,0 +1,62 @@
+Testear en
+1- mainnet-fork
+2- development with mocks
+3- testnet
+
+Recordemos que mainnet fork es una copia de la mainnet.
+
+
+1 - Primero voy a hacer la conexion con el contrato AggregateV3Interface, cosa de obtener correctamente el precio del Ether en dolares
+
+Para eso necesito importar de Chainlink la interfaz del contrato AggregatorV3Interface. https://docs.chain.link/docs/get-the-latest-price/
+
+
+Luego lo que tengo que hacer es incluir el codigo de la interfaz esa en mi proyecto. Lo puedo hacer manualmente agregandolo a mano
+O puedo hacer que Brownie descargue las dependencias. Para ello, busco chainlink brownie contract.
+https://github.com/smartcontractkit/chainlink-brownie-contracts
+
+Necesito agregar las dependencias en el archivo de configuracion y el mapeo de @chainlink a smartcontractkit
+(ver brownie-config.yaml)
+
+
+Luego procedo a hacer la funcion de getEntranceFee(), que hace lo mismo que en el proyecto de FundMe:
+- Obtiene de Chainlink el valor de ETH.
+Para poder operarlo en Wei tengo que hacer unas transformaciones que al fin y al cabo son las mismas de siempre
+Esto es porque Solidity no trabaja con floats
+
+Luego para poder testearlo, borro la red mainnet-fork que esta por default y agrego la red nueva
+
+brownie networks add development mainnet-fork cmd=ganache-cli host=http://127.0.0.1 
+        fork=https://eth-mainnet.alchemyapi.io/v2/uiZLMMVIfyEdc-PJaIMGbtBDeAj7nJM6 
+        accounts=10 mnemonic=brownie port=8545
+
+
+Primero necesito una API Key para poder hacer las request a la mainnet forkeada que esta en Alchemy.io
+Para eso me hago la cuenta y saco la Api key de ahi. O puede ser Infura, lo mismo.
+
+Luego a la hora de hacer el deploy del contrato, tengo que pasarle al constructor la direccion del contrato de la mainnet.
+La misma la puedo agregar al archivo de configuracion para no tenerla hardcodeada.
+
+
+2- Ahora hay que solucionar el tema del Random
+
+Fijandome en la documentacion de Chainlink hay una guia para obtener el Random
+Tengo que importar cierto contrato, y hacer que mi contrato consumidor herede del mismo e implemente ciertas funciones.
+Tengo ciertos valores que los puedo poner en el config y pasarselos al constructor cuando los construyo
+El contrato tiene que tener ciertos fondos para ejecutar la transaccion y pagarle el trabajo al chainlink node
+AL data feeds chainlink no le pague nada porque ya tiene sponsors que se encargan de cubrir esos gastos. Ademas ese valor se actualiza cada una hora o si se pasa de cierta desviacion
+por lo que el valor no se recalcula todo el tiempo.
+Se llama LINK gas.
+
+LLamamos a requestRandomness(bytes32 _keyhash, uint256 _fee)
+- keyhash identifica al chainlink node
+- fee es la cantidad de gas que vamos a pagarle
+
+Definimos la funcion fulfillRandomness(bytes32 requestId, uint256 randomness) internal override{
+        //logica
+}
+Esa seria como la funcion callback, el contrato de chainlink nos envia el resultado una vez calculado invocando esa funcion
+
+
+
+
