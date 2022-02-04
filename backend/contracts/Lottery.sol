@@ -23,9 +23,11 @@ contract Lottery is Ownable, VRFConsumerBase {
     //sacado de la doc de chainlink.
     uint256 public fee;
     bytes32 public keyhash; //forma de identificar univocamente un nodo de chainlink vrf
-    uint256 public lastRandom;
 
+    uint256 public lastRandom; //esto es simplemente para tener control de estos 2 valores nada mas
     address payable public lastWinner;
+
+    event RequestedRandomness(bytes32 requestId);
 
     constructor(
         address _priceFeed,
@@ -85,11 +87,15 @@ contract Lottery is Ownable, VRFConsumerBase {
         );
         state = LOTTERY_STATE.CALCULATING_WINNER;
         //numero random entre 0 y players.length -1 inclusive
-        requestRandomness(keyhash, fee);
+        bytes32 requestId = requestRandomness(keyhash, fee);
         //esto va a enviar una transaccion a la blockchain solicitando el random y pagando ese fee.
         //En otra transaccion se me envia el resultado. El nodo de chainlink envia el resultado a VRFCoordinator (rawfulfillRandomness)
         // y este verifica la respuesta y ejecuta la funcion fulfillRandomness. Por eso es internal
         //Basic request model
+        emit RequestedRandomness(requestId); //se dispara un evento que queda guardado en la blockchain
+        //como un log_info. Ahora este evento queda asociado a la transaccion y puedo accedr a los valores
+        //que le pase desde cualquier otro lado, ya sea Frontend o python. Es otra forma de almacenar informacion
+        //muchisimo mas barata. Contra? no puedo acceder a esos logs desde el smart contract
     }
 
     //siguiendo la documentacion

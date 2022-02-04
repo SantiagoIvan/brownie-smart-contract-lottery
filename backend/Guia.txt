@@ -57,6 +57,18 @@ Definimos la funcion fulfillRandomness(bytes32 requestId, uint256 randomness) in
 }
 Esa seria como la funcion callback, el contrato de chainlink nos envia el resultado una vez calculado invocando esa funcion
 
+El Chainlink Node llama a una funcion llamada CallbackWithRandomness que se encuentra en el contrato VRFCoordinator, y este es el que
+eventualmente llama a nuestra funcion fulfillRandomness
+
+Si queremos testear toda la funcionalidad, tenemos que 'pretender' ser el chainlink node y disparar ese proceso llamando a esa funcion.
+Fijandome en los parametros que necesito para invocar a esa funcion, veo que necesito 
+        - un numero (el random que nos daria chainlink pero puedo mandar cualquiera)
+        - direccion del contrato cliente, donde va a estar definida fulfillRandomness
+        - RequestId asociada con la request que disparo todo el proceso, es decir, requestRandomness
+Pero necesitamos una forma de acceder a ese valor de RequestId que devuelve esa funcion, porque asi nomas
+no podemos acceder.
+Para estos casos se puede usar los Eventos.
+Se emite un evento y se guarda esa informacion en la blockchain, como un Log.
 
 
 

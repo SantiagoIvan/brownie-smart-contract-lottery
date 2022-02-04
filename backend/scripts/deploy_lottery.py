@@ -57,7 +57,8 @@ def end_lottery():
     lottery = Lottery[-1]
 
     # Para que nuestro contrato pueda pedir el numero random a chainlink, tiene que tener fondos para gastar(Link gas)
-    fund_with_link(lottery.address)
+    tx = fund_with_link(lottery.address)
+    tx.wait(1)
     tx = lottery.endLottery({"from": account})
     tx.wait(1)
     time.sleep(60)

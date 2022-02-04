@@ -1,0 +1,5 @@
+1) podria hacer que en un cierto horario termine el sorteo y no manualmente
+2) podria hacer que al calcular al ganador, se emita un evento cosa que quede guardado
+en la blockchain y yo desde afuera pueda acceder a todos los ganadores.
+Seria una opcion mas barata para almacenar ese log.
+Ademas dentro del contrato no voy a acceder a esa informacion, no me interesa.
