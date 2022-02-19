@@ -4,9 +4,4 @@ si quiero crear el listener, lo hago en otro useEffect, asi quedan las logicas s
 El tema es que de esa forma, si quiero acceder a alguna propiedad, como el setState es asincrono
 me tira null y no anda como deberia. 
 
-2) Redireccion si es admin. Autenticacion al principio de todo en App
-
-Algo parecido me sucede cuando quiero hacer el useEffect al principio, en App js para saber si es el admin
-Para controlar si es admin, necesito saber el owner del contrato, por lo que necesito tener seteado el contrato
-
-
+Home.js, appContext.js

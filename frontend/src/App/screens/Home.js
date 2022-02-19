@@ -10,14 +10,21 @@ import Loading from '../../components/Loading'
 
 
 const Home = () => {
-    const [lotteryInfo, setLotteryInfo] = useState({ "entranceFee": BigNumber.from("0"), "players": "0", "prize": "0" })
-    const { account, provider, contract, loading, setLoading } = useAppContext()
+    const { account, provider, contract, loading, setLoading, setLotteryInfo, lotteryInfo } = useAppContext()
 
+
+    //preguntarle a facu por que el contrato es null osea es null porque el setState es asincrono
+    //pero como podria solucionarlo. Porque esta logica la traslade al App Context
+    //y me sucede lo mismo, para que funcione utilice la variable local creada alli, pero no el estado 'contract'
+
+    // const updatePlayersCount = async () => {
+    //     const _count = await contract.getPlayersCount()
+    //     setLotteryInfo(prevState => ({ ...prevState, "players": _count }))
+    // }
     // useEffect(() => {// TODO contract null
     //     const listener = contract.on("NewPlayer", async (_player, _) => {
     //         console.log("New player detected: ", _player)
-    //         const _count = await lotteryInfogetPlayersCount()
-    //         setLotteryInfo({ ...lotteryInfo, "players": _count })
+    //         updatePlayersCount()
     //     })
 
     //     return () => {
