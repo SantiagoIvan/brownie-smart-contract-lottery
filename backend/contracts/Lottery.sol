@@ -28,6 +28,10 @@ contract Lottery is Ownable, VRFConsumerBase {
     address payable public lastWinner;
 
     event RequestedRandomness(bytes32 requestId);
+    event NewPlayer(address payable player);
+    event LotteryHasStarted();
+    event CalculatingWinner();
+    event LotteryHasEnded(address payable indexed winner);
 
     constructor(
         address _priceFeed,
@@ -70,6 +74,8 @@ contract Lottery is Ownable, VRFConsumerBase {
         require(msg.value >= getEntranceFee(), "Not enough Eth, you rat!");
         uint256 diff = msg.value - getEntranceFee(); //todo se puede devolver la diferencia?
         players.push(msg.sender);
+
+        emit NewPlayer(msg.sender);
     }
 
     function startLottery() external onlyOwner {
@@ -78,6 +84,8 @@ contract Lottery is Ownable, VRFConsumerBase {
             "Previous lottery is not finished yet!"
         );
         state = LOTTERY_STATE.OPEN;
+
+        emit LotteryHasStarted();
     }
 
     function endLottery() external onlyOwner {
@@ -96,6 +104,7 @@ contract Lottery is Ownable, VRFConsumerBase {
         //como un log_info. Ahora este evento queda asociado a la transaccion y puedo accedr a los valores
         //que le pase desde cualquier otro lado, ya sea Frontend o python. Es otra forma de almacenar informacion
         //muchisimo mas barata. Contra? no puedo acceder a esos logs desde el smart contract
+        emit CalculatingWinner();
     }
 
     //siguiendo la documentacion
@@ -113,9 +122,10 @@ contract Lottery is Ownable, VRFConsumerBase {
 
         lastWinner.transfer(address(this).balance);
         resetLottery();
+        emit LotteryHasEnded(lastWinner);
     }
 
-    function resetLottery() internal {
+    function resetLottery() public {
         players = new address payable[](0);
         state = LOTTERY_STATE.CLOSED;
     }

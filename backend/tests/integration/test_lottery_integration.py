@@ -15,10 +15,11 @@ def test_deploy_on_rinkeby_succesful():
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIROMENTS:
         pytest.skip()
     account = get_account()
-    lottery = Lottery[-1] if Lottery[-1] else deploy_lottery()
+    lottery = Lottery[-1] if len(Lottery) else deploy_lottery()
 
     assert len(Lottery) == 1
     assert lottery.owner() == account.address
+    assert 1 == 0
 
 
 def test_lottery_pick_a_winner_succesfully():

@@ -40,7 +40,7 @@ def get_contract(contract_name):
     """
     https://github.com/smartcontractkit/chainlink-mix/blob/master/scripts/helpful_scripts.py
 
-    esta funcion va a tomar la direccion del config si estan definidas, para la red en la que estoy actualmente.
+    Esta funcion va a tomar la direccion del config si estan definidas, para la red en la que estoy actualmente.
     Esto es porque si estoy en ganache local, no voy a tener definidas esas direcciones, por lo que voy
     a tener que deployar los mocks.
     Esto me va a permitir obtener la direccion de un contrato, y si estoy en local, voy a deployar el mock
