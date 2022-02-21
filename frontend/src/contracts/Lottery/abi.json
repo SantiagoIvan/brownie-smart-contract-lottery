@@ -50,6 +50,12 @@
                 "internalType": "address payable",
                 "name": "winner",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
             }
         ],
         "name": "LotteryHasEnded",
@@ -225,13 +231,6 @@
             }
         ],
         "name": "rawFulfillRandomness",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "resetLottery",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

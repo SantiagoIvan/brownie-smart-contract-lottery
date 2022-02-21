@@ -5,11 +5,12 @@ export const MainButton = styled.button`
     margin-right: 2rem;
     border-radius: 12px;
     padding: 10px 24px;
-    background-color: #e0792a;
+    background-color: #b48608;
     color: #23394d;
     font-weight: bold;
     border: none;
     cursor: pointer;
+    font-family: 'Montaga', serif;
 
     &:disabled{
         background-color: grey;
