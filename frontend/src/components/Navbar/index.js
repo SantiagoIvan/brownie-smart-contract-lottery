@@ -33,7 +33,7 @@ const Navbar = () => {
     return (
         <Container>
             <Wrapper>
-                <IconContext.Provider value={{ style: { fontSize: "2.5rem", color: "#e0792a" } }}>
+                <IconContext.Provider value={{ style: { fontSize: "2.5rem", color: "#b48608" } }}>
                     <LogoContainer onClick={() => handleLogoClick()}>
                         <NavLink to="/">
                             <MdOutlineCasino />

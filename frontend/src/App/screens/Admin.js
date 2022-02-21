@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { BigNumber } from 'ethers'
+import React, { useState, useCallback, useEffect } from 'react'
+import { BigNumber, utils } from 'ethers'
 
 import { MainButton } from '../../components/Button'
 import Loading from '../../components/Loading'
@@ -11,7 +11,28 @@ import { useAppContext } from '../../context/appContext'
 
 const Admin = () => {
     const [calculatingWinner, setCalculatingWinner] = useState(null)
-    const { account, provider, contract, loading, setLoading } = useAppContext()
+    const [winner, setWinner] = useState({ "winner": "", "prize": BigNumber.from("0") })
+    const { provider, contract, loading, setLoading } = useAppContext()
+
+    const listener = useCallback(
+        (winner, amount, event) => {
+            alert("Last winner: ", winner)
+            setWinner({ winner, "prize": amount })
+            setCalculatingWinner(false)
+        }
+        ,
+        []
+    )
+
+    useEffect(() => {
+        if (contract) {
+            contract.on("LotteryHasEnded", listener)
+        }
+        return () => {
+            contract?.off("LotteryHasEnded", listener)
+        }
+    }, [contract, listener])
+
 
     const startLottery = async (e) => {
         setLoading(true)
@@ -32,24 +53,18 @@ const Admin = () => {
         }
     }
 
+
     const endLottery = async (e) => {
         setLoading(true)
         try {
             e.preventDefault()
             const signer = await provider.getSigner()
             const transaction = await contract.populateTransaction.endLottery()
-            console.log("Transaction pura", { transaction })
             const execTx = await signer.sendTransaction({ ...transaction })
 
             const receipt = await provider.waitForTransaction(execTx.hash)
             alert("Succesfully finished. Waiting por results...", { receipt })
-            contract.on("LotteryHasEnded", (winner, event) => {
-                console.log({ winner, event })
-                alert("Last winner: ", winner)
-            })
-            provider.on("block", (blockNumber) => {
-                console.log(blockNumber)
-            })
+
             setCalculatingWinner(true)
         } catch (error) {
             console.log("Error al finalizar la loteria", { error })
@@ -59,28 +74,10 @@ const Admin = () => {
         }
     }
 
-    const resetLottery = async (e) => {
-        setLoading(true)
-        try {
-            e.preventDefault()
-
-            const signer = await provider.getSigner()
-            const transaction = await contract.populateTransaction.resetLottery()
-            const execTx = await signer.sendTransaction({ ...transaction })
-
-            await provider.waitForTransaction(execTx.hash)
-            alert("Succesfully reseted!")
-        } catch (error) {
-            console.log("Error al resetear la loteria", { error })
-            alert("Error al resetear la loteria.")
-        } finally {
-            setLoading(false)
-        }
-    }
 
     return (
         <>
-            {loading ? <Loading /> : (//CAMBIAR ESE (account?)
+            {loading ? <Loading /> : (
                 <>
                     <section>
                         <Title>Admin panel</Title>
@@ -92,12 +89,10 @@ const Admin = () => {
                             <MainButton onClick={endLottery}>
                                 End Lottery
                             </MainButton>
-                            <MainButton onClick={resetLottery}>
-                                Reset Lottery
-                            </MainButton>
                         </Container>
 
-                        {calculatingWinner ? <Text>Calculating winner. This may take a while...</Text> : <></>}
+                        {calculatingWinner && <Text>Calculating winner. This may take a while...</Text>}
+                        {winner.winner && <Text>We have a winner! The address {winner.winner} has won {utils.formatEther(winner.prize)} Ether</Text>}
                     </section>
                 </>
             )}

@@ -6,18 +6,18 @@ import {
   useNavigate
 } from "react-router-dom";
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
 function App() {
   const { account, contract } = useAppContext()
   const navigate = useNavigate()
 
-  const checkAdmin = async () => {
+  const checkAdmin = useCallback(async () => {
     const _owner = await contract.owner()
     if (_owner.toLowerCase() === account.toLowerCase()) {
       navigate("/admin")
     }
-  }
+  }, [contract, account, navigate])
 
   useEffect(() => {
     if (!account) {
@@ -25,7 +25,7 @@ function App() {
     } else {
       checkAdmin()
     }
-  }, [account])
+  }, [account, checkAdmin, navigate])
 
   return (
     <>

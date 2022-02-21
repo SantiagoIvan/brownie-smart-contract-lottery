@@ -31,7 +31,7 @@ contract Lottery is Ownable, VRFConsumerBase {
     event NewPlayer(address payable player);
     event LotteryHasStarted();
     event CalculatingWinner();
-    event LotteryHasEnded(address payable indexed winner);
+    event LotteryHasEnded(address payable indexed winner, uint256 amount);
 
     constructor(
         address _priceFeed,
@@ -72,7 +72,7 @@ contract Lottery is Ownable, VRFConsumerBase {
     function enterLottery() public payable {
         require(state == LOTTERY_STATE.OPEN, "Lottery is not open!");
         require(msg.value >= getEntranceFee(), "Not enough Eth, you rat!");
-        uint256 diff = msg.value - getEntranceFee(); //todo se puede devolver la diferencia?
+        uint256 diff = msg.value - getEntranceFee();
         players.push(msg.sender);
 
         emit NewPlayer(msg.sender);
@@ -89,10 +89,7 @@ contract Lottery is Ownable, VRFConsumerBase {
     }
 
     function endLottery() external onlyOwner {
-        require(
-            state == LOTTERY_STATE.OPEN,
-            "You cant end something u didnt started"
-        );
+        require(state == LOTTERY_STATE.OPEN, "Lottery is already closed");
         state = LOTTERY_STATE.CALCULATING_WINNER;
         //numero random entre 0 y players.length -1 inclusive
         bytes32 requestId = requestRandomness(keyhash, fee);
@@ -119,13 +116,14 @@ contract Lottery is Ownable, VRFConsumerBase {
         uint256 indexOfWinner = _randomness % players.length;
         lastRandom = _randomness;
         lastWinner = players[indexOfWinner];
+        uint256 amount = address(this).balance;
 
         lastWinner.transfer(address(this).balance);
         resetLottery();
-        emit LotteryHasEnded(lastWinner);
+        emit LotteryHasEnded(lastWinner, amount);
     }
 
-    function resetLottery() public {
+    function resetLottery() internal {
         players = new address payable[](0);
         state = LOTTERY_STATE.CLOSED;
     }

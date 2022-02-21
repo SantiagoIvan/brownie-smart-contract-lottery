@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 import { useAppContext } from '../../context/appContext'
 
 import { Title } from "../../components/Title";
 import { MainButton } from "../../components/Button";
-import { BigNumber, utils } from 'ethers'
+import { utils } from 'ethers'
 import { Text, Container } from "../../components/Text";
 import Loading from '../../components/Loading'
 
@@ -12,25 +12,35 @@ import Loading from '../../components/Loading'
 const Home = () => {
     const { account, provider, contract, loading, setLoading, setLotteryInfo, lotteryInfo } = useAppContext()
 
+    const updatePlayersCount = useCallback(async () => {
+        if (!contract) return;
+        const _count = await contract.getPlayersCount()
+        const _fee = await contract.getEntranceFee()
+        setLotteryInfo({ "entranceFee": _fee, "players": _count.toString(), "prize": utils.formatEther(_count.mul(_fee)) })
+    }, [contract, setLotteryInfo])
 
-    //preguntarle a facu por que el contrato es null osea es null porque el setState es asincrono
-    //pero como podria solucionarlo. Porque esta logica la traslade al App Context
-    //y me sucede lo mismo, para que funcione utilice la variable local creada alli, pero no el estado 'contract'
+    const listener = useCallback(async (_player, _) => {
+        updatePlayersCount()
+    }, [updatePlayersCount])
 
-    // const updatePlayersCount = async () => {
-    //     const _count = await contract.getPlayersCount()
-    //     setLotteryInfo(prevState => ({ ...prevState, "players": _count }))
-    // }
-    // useEffect(() => {// TODO contract null
-    //     const listener = contract.on("NewPlayer", async (_player, _) => {
-    //         console.log("New player detected: ", _player)
-    //         updatePlayersCount()
-    //     })
 
-    //     return () => {
-    //         contract.off("NewPlayer", listener)
-    //     }
-    // }, [])
+
+    useEffect(() => {
+        if (contract) {
+            contract.on("NewPlayer", listener)
+        }
+        return () => {
+            contract?.off("NewPlayer", listener)
+        }
+    }, [contract, listener])
+
+    useEffect(() => {
+        if (contract) {
+            updatePlayersCount()
+        }
+    }, [contract, updatePlayersCount])
+
+
 
     const getEntranceFee = async () => {
         setLoading(true)
@@ -70,7 +80,7 @@ const Home = () => {
                 <>
                     <section>
                         <Title>
-                            Welcome to CryptoLottery
+                            CryptoLottery
                         </Title>
                         <Text>Current players count: {lotteryInfo.players}</Text>
                         <Container>

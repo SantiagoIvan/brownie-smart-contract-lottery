@@ -19,7 +19,6 @@ def test_deploy_on_rinkeby_succesful():
 
     assert len(Lottery) == 1
     assert lottery.owner() == account.address
-    assert 1 == 0
 
 
 def test_lottery_pick_a_winner_succesfully():

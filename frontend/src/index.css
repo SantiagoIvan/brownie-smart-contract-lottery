@@ -4,11 +4,11 @@
     box-sizing: border-box;
 }
 body{
-    background-color: black
+    background-color: rgb(5, 20, 43)
 }
 section{
     display:flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 2rem;
+    margin: 4rem;
 }
