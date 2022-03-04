@@ -41,7 +41,7 @@ const Navbar = () => {
                     </LogoContainer>
                 </IconContext.Provider>
                 <MainButton onClick={handleConnectButtonClick}>
-                    {account || "Connect your wallet"}
+                    {account ? "Log out: " + account.slice(0, 10) + "..." : "Connect your wallet"}
                 </MainButton>
             </Wrapper>
         </Container>
