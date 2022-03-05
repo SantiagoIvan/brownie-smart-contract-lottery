@@ -12,19 +12,43 @@ const AppContextProvider = ({ children }) => {
     const [provider, setProvider] = useState(null)
     const [contract, setContract] = useState(null)
     const [lotteryInfo, setLotteryInfo] = useState({ "entranceFee": BigNumber.from("0"), "players": "0", "prize": "0" })
+    const [chainId, setChainId] = useState(null)
+    const [appDisabled, setAppDisabled] = useState(false)
 
     useEffect(() => {
-        if (window.ethereum) {
-            const _provider = new providers.Web3Provider(window.ethereum, 'any')
-            const _contract = Lottery({
-                provider: _provider,
-                address: process.env.REACT_APP_CONTRACT_ADDRESS,
-            })
-            setProvider(_provider)
-            setContract(_contract)
+        window.ethereum.on("chainChanged", () => window.location.reload())
+        const getChainId = async () => {
+            const _id = await window.ethereum.request({ method: 'eth_chainId' });
+            console.log(_id)
+            setChainId(_id)
         }
 
-    }, [])
+        if (window.ethereum) {
+            const _provider = new providers.Web3Provider(window.ethereum, 'any')
+            setProvider(_provider)
+
+            getChainId()
+            if (chainId) {
+                if (["0x4", "0x2a"].includes(chainId)) {
+                    let _addr
+                    if (chainId === "0x4") { _addr = process.env.REACT_APP_RINKEBY_CONTRACT_ADDRESS }
+                    else { _addr = process.env.REACT_APP_KOVAN_CONTRACT_ADDRESS }
+                    const _contract = Lottery({
+                        provider: _provider,
+                        address: _addr,
+                    })
+                    setContract(_contract)
+                } else {
+                    alert("Select Kovan or Rinkeby network")
+                    setAppDisabled(true)
+                }
+
+            }
+        }
+        return () => {
+            document.removeEventListener("chainChanged", () => window.location.reload())
+        }
+    }, [chainId])
 
     return (
         <AppContext.Provider
@@ -38,7 +62,9 @@ const AppContextProvider = ({ children }) => {
                 contract,
                 setContract,
                 lotteryInfo,
-                setLotteryInfo
+                setLotteryInfo,
+                appDisabled,
+                setAppDisabled
             }}
         >
             {children}

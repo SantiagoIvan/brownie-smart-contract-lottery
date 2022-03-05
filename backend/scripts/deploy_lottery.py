@@ -68,9 +68,6 @@ def end_lottery():
 
 def main():
     deploy_lottery()
-    start_lottery()
-    enter_lottery()
-    end_lottery()
 
 
 # en ganache-local, el ganador es el 0x0 justamente porque no hay un nodo de chainlink que responda

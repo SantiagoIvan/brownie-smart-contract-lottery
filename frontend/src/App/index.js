@@ -9,7 +9,7 @@ import {
 import { useCallback, useEffect } from 'react'
 
 function App() {
-  const { account, contract } = useAppContext()
+  const { account, contract, appDisabled } = useAppContext()
   const navigate = useNavigate()
 
   const checkAdmin = useCallback(async () => {
@@ -27,6 +27,13 @@ function App() {
     }
   }, [account, checkAdmin, navigate])
 
+  if (appDisabled) {
+    return (
+      <>
+        <h1 style={{ color: "white" }}>App disabled</h1>
+      </>
+    )
+  }
   return (
     <>
       <Navbar />
