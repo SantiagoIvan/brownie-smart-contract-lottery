@@ -19,7 +19,6 @@ const AppContextProvider = ({ children }) => {
         window.ethereum.on("chainChanged", () => window.location.reload())
         const getChainId = async () => {
             const _id = await window.ethereum.request({ method: 'eth_chainId' });
-            console.log(_id)
             setChainId(_id)
         }
 
