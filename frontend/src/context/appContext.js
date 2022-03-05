@@ -28,21 +28,19 @@ const AppContextProvider = ({ children }) => {
             setProvider(_provider)
 
             getChainId()
-            if (chainId) {
-                if (["0x4", "0x2a"].includes(chainId)) {
-                    let _addr
-                    if (chainId === "0x4") { _addr = process.env.REACT_APP_RINKEBY_CONTRACT_ADDRESS }
-                    else { _addr = process.env.REACT_APP_KOVAN_CONTRACT_ADDRESS }
-                    const _contract = Lottery({
-                        provider: _provider,
-                        address: _addr,
-                    })
-                    setContract(_contract)
-                } else {
-                    alert("Select Kovan or Rinkeby network")
-                    setAppDisabled(true)
-                }
-
+            if (!chainId) return
+            if (["0x4", "0x2a"].includes(chainId)) {
+                let _addr
+                if (chainId === "0x4") { _addr = process.env.REACT_APP_RINKEBY_CONTRACT_ADDRESS }
+                else { _addr = process.env.REACT_APP_KOVAN_CONTRACT_ADDRESS }
+                const _contract = Lottery({
+                    provider: _provider,
+                    address: _addr,
+                })
+                setContract(_contract)
+            } else {
+                alert("Select Kovan or Rinkeby network")
+                setAppDisabled(true)
             }
         }
         return () => {
