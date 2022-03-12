@@ -16,7 +16,8 @@ const Home = () => {
         if (!contract) return;
         const _count = await contract.getPlayersCount()
         const _fee = await contract.getEntranceFee()
-        setLotteryInfo({ "entranceFee": _fee, "players": _count.toString(), "prize": utils.formatEther(_count.mul(_fee)) })
+        const _state = await contract.state()
+        setLotteryInfo({ "entranceFee": _fee, "players": _count.toString(), "prize": utils.formatEther(_count.mul(_fee)), "state": _state })
     }, [contract, setLotteryInfo])
 
     const listener = useCallback(async (_player, _) => {
@@ -95,12 +96,14 @@ const Home = () => {
                             </Text>
                         </Container>
 
-                        <MainButton disabled={!account} onClick={enterLottery}>
-                            Buy a ticket now!
-                        </MainButton>
-
                         <Text>
                             More tickets = More chances to win!
+                        </Text>
+                        <MainButton disabled={!account || lotteryInfo.state !== 0} onClick={enterLottery}>
+                            Buy a ticket now!
+                        </MainButton>
+                        <Text>
+                            Lottery: {lotteryInfo.state === 1 ? "Closed" : lotteryInfo.state === 0 ? "Open" : "Calculating winner!"}
                         </Text>
                     </section>
                 </>

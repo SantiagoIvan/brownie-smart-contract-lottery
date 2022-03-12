@@ -11,7 +11,7 @@ const AppContextProvider = ({ children }) => {
     const [account, setAccount] = useState('')
     const [provider, setProvider] = useState(null)
     const [contract, setContract] = useState(null)
-    const [lotteryInfo, setLotteryInfo] = useState({ "entranceFee": BigNumber.from("0"), "players": "0", "prize": "0" })
+    const [lotteryInfo, setLotteryInfo] = useState({ "entranceFee": BigNumber.from("0"), "players": "0", "prize": "0", "state": 1 })
     const [chainId, setChainId] = useState(null)
     const [appDisabled, setAppDisabled] = useState(false)
 
